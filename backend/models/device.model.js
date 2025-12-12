@@ -14,12 +14,22 @@ const DeviceSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
-    watertankLevel:{
+    tankLevel:{
         type: Number,
         required: true,
         default: 0
     },
     humidity:{
+        type: Number,
+        required: true,
+        default: 0
+    },
+    temperature:{
+        type: Number,
+        required: true,
+        default: 0
+    },
+    soilMoisture:{
         type: Number,
         required: true,
         default: 0
