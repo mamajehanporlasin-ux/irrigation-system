@@ -14,11 +14,6 @@ const DeviceSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
-    isRaining:{
-        type: Boolean,
-        required: true,
-        default: false
-    },
     temperature:{
         type: Number,
         required: true,
@@ -29,15 +24,40 @@ const DeviceSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
-    tankLevel:{
+    reservoirLevel:{
+        type: String,
+        required: true,
+        default: "OK"
+    },
+    soilMoisture1:{
         type: Number,
         required: true,
         default: 0
     },
-    soilMoisture:{
+    soilMoisture2:{
         type: Number,
         required: true,
         default: 0
+    },
+    soilMoisture3:{
+        type: Number,
+        required: true,
+        default: 0
+    },
+    isWaterLevelLow1:{
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    isWaterLevelLow2:{
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    isWaterLevelLow3:{
+        type: Boolean,
+        required: true,
+        default: false
     }
 });
 

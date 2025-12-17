@@ -10,11 +10,11 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-  origin: '*',                 // Allows access from ALL origins (e.g., http://localhost:3000, https://example.com, etc.)
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow all standard methods
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   preflightContinue: false,
   optionsSuccessStatus: 204,
-  credentials: true,           // <--- Important for withCredentials: true on the client side
+  credentials: true,
 }));
 
 

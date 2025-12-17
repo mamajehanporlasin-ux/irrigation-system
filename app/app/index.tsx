@@ -5,18 +5,6 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import axiosInstance from '../axiosConfig.js';
 
 
-const getStatusStyles = (status) => {
-  switch (status) {
-    case 'Operational': return 'bg-green-100 text-green-700 border-green-300';
-    case 'Low Battery': return 'bg-yellow-100 text-yellow-700 border-yellow-300';
-    case 'Offline': return 'bg-red-100 text-red-700 border-red-300';
-    default: return 'bg-gray-100 text-gray-700 border-gray-300';
-  }
-};
-
-/**
- * Individual Card Component for a single device metric.
- */
 const MetricCard = ({ title, value, unit, iconName, color }) => (
   <View className={`w-1/2 p-2`}>
     <View className={`flex-row items-center p-3 rounded-xl shadow-sm border border-gray-100 ${color}`}>
@@ -40,55 +28,94 @@ const DeviceCard = ({ device }) => {
   const temperature = device.temperature;
   const soilMoisture=device.soilMoisture;
   const deviceID=device.deviceID;
-  const statusClasses = getStatusStyles(status);
-
+  
   return (
     <TouchableOpacity 
       className="bg-white mx-4 mt-4 p-4 rounded-xl shadow-md border border-gray-100 active:bg-gray-50"
-      onPress={() => console.log(`Device ${name} tapped`)} // Action when device is tapped
+      onPress={() => console.log(`Device ${device.deviceID} tapped`)} // Action when device is tapped
       activeOpacity={0.8}
     >
-      {/* Header and Status */}
       <View className="flex-row justify-between items-start pb-3 mb-3 border-b border-gray-100">
         <View className="flex-shrink">
-          <Text className="text-xl font-extrabold text-gray-900">{deviceID}</Text>
-        </View>
-        <View className={`px-3 py-1 rounded-full border ${statusClasses}`}>
+          <Text className="text-xl font-extrabold text-gray-900">{device.deviceID}</Text>
         </View>
       </View>
 
-      {/* Metrics Section (2x2 Grid) */}
       <View className="flex-row flex-wrap -m-2">
         <MetricCard 
           title="Humidity" 
-          value={humidity} 
+          value={device.humidity} 
           unit="%" 
           iconName="water-percent" 
           color="bg-blue-50" 
         />
         <MetricCard 
           title="Temperature" 
-          value={temperature} 
+          value={device.temperature} 
           unit="°C" 
           iconName="temperature-celsius" 
           color="bg-red-50" 
         />
-        <MetricCard 
-          title="Tank Level" 
-          value={tankLevel} 
-          unit="%" 
-          iconName="water-boiler" 
-          color="bg-cyan-50" 
-        />
-        <MetricCard 
-          title="Soil Moisture" 
-          value={soilMoisture} 
-          unit=" raw" 
-          iconName="spa" 
-          color="bg-amber-50" 
-        />
       </View>
-      
+      <View className="flex flex-col w-auto h-auto mx-3 mt-2 hover:bg-blue-200 border border-gray-200">
+        <Text className="text-lg font-extrabold text-gray-900 mx-3 my-2">Field 1</Text>
+        <View className="flex flex-row">
+            <MetricCard
+              title="Water Level" 
+              value={tankLevel} 
+              unit="" 
+              iconName="water-boiler" 
+              color="bg-cyan-50" 
+            />
+            <MetricCard 
+              title="Soil Moisture" 
+              value={soilMoisture} 
+              unit=" " 
+              iconName="spa" 
+              color="bg-amber-50" 
+            />
+          </View>
+        </View>
+        
+        <View className="flex flex-col w-auto h-auto mx-3 border border-gray-200 hover:bg-blue-200">
+        <Text className="text-lg font-extrabold text-gray-900 mx-3 my-2">Field 2</Text>
+        <View className="flex flex-row">
+            <MetricCard
+              title="Water Level" 
+              value={tankLevel} 
+              unit="" 
+              iconName="water-boiler" 
+              color="bg-cyan-50" 
+            />
+            <MetricCard 
+              title="Soil Moisture" 
+              value={soilMoisture} 
+              unit=" " 
+              iconName="spa" 
+              color="bg-amber-50" 
+            />
+          </View>
+        </View>
+
+        <View className="flex flex-col w-auto h-auto mx-3 border border-gray-200 hover:bg-blue-200">
+        <Text className="text-lg font-extrabold text-gray-900 mx-3 my-2">Field 3</Text>
+        <View className="flex flex-row">
+            <MetricCard
+              title="Water Level" 
+              value={tankLevel} 
+              unit="" 
+              iconName="water-boiler" 
+              color="bg-cyan-50" 
+            />
+            <MetricCard 
+              title="Soil Moisture" 
+              value={soilMoisture} 
+              unit=" " 
+              iconName="spa" 
+              color="bg-amber-50" 
+            />
+          </View>
+        </View>
     </TouchableOpacity>
   );
 };
@@ -127,7 +154,6 @@ const IrrigationDashboard = () => {
 
   return (
     <SafeAreaView className="flex-1 bg-gray-100">
-      <StatusBar style="dark" />
       
       {/* Render the simple header */}
       <Header />
