@@ -62,14 +62,14 @@ const DeviceCard = ({ device }) => {
         <View className="flex flex-row">
             <MetricCard
               title="Water Level" 
-              value={tankLevel} 
+              value={device.isWaterLevelLow1} 
               unit="" 
               iconName="water-boiler" 
               color="bg-cyan-50" 
             />
             <MetricCard 
               title="Soil Moisture" 
-              value={soilMoisture} 
+              value={device.soilMoisture1} 
               unit=" " 
               iconName="spa" 
               color="bg-amber-50" 
@@ -82,14 +82,14 @@ const DeviceCard = ({ device }) => {
         <View className="flex flex-row">
             <MetricCard
               title="Water Level" 
-              value={tankLevel} 
+              value={device.isWaterLevelLow2} 
               unit="" 
               iconName="water-boiler" 
               color="bg-cyan-50" 
             />
             <MetricCard 
               title="Soil Moisture" 
-              value={soilMoisture} 
+              value={device.soilMoisture2} 
               unit=" " 
               iconName="spa" 
               color="bg-amber-50" 
@@ -102,14 +102,14 @@ const DeviceCard = ({ device }) => {
         <View className="flex flex-row">
             <MetricCard
               title="Water Level" 
-              value={tankLevel} 
+              value={device.isWaterLevelLow3} 
               unit="" 
               iconName="water-boiler" 
               color="bg-cyan-50" 
             />
             <MetricCard 
               title="Soil Moisture" 
-              value={soilMoisture} 
+              value={device.soilMoisture3} 
               unit=" " 
               iconName="spa" 
               color="bg-amber-50" 
