@@ -28,7 +28,8 @@ const UserSchema = new mongoose.Schema({
     },
     addressDetail:{
         type: String,
-        required: false
+        required: false,
+        default: ""
     },
     regCode:{
         type: Number,
