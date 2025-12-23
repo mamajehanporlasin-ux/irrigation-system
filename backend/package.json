@@ -12,10 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-<<<<<<< HEAD
     "axios": "^1.13.2",
-=======
->>>>>>> f400d892dd942d18ad749483142ac48e37a687c5
     "bcryptjs": "^3.0.3",
     "body-parser": "^2.2.1",
     "cookie-parser": "^1.4.7",
