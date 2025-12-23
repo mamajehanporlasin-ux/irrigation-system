@@ -21,11 +21,13 @@ export const isUserEmailExisting = async (email, idToExcempt) =>{
 }
 
 
-export const isDeviceIDExisting = async (devID) =>{
+export const isDeviceIDExisting = async (devID, idToExcempt) =>{
     try{
         const device=await Device.find({deviceID: devID});
 
         if(!device || device.length<1){
+            return false;
+        }else if(idToExcempt == device[0]._id){
             return false;
         }else{
             return true;

@@ -14,6 +14,11 @@ const DeviceSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
+    owner:{
+        type: mongoose.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     temperature:{
         type: Number,
         required: true,
