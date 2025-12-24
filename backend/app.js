@@ -4,6 +4,7 @@ import { config as dotenvConfig } from 'dotenv';
 import fs from 'fs';
 import deviceRouter from './routers/device.router.js';
 import userRouter from './routers/user.router.js';
+import eventRouter from './routers/event.router.js';
 import checkOfflineDevices from './functions/checkOfflineDevices.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -32,6 +33,7 @@ dotenvConfig({ path: secretPath });
 
 app.use("/api/device", deviceRouter);
 app.use("/api/user", userRouter);
+app.use("/api/event", eventRouter);
 app.get("/", (req, res)=>{
     res.json({message: "Server is working!"})
 });

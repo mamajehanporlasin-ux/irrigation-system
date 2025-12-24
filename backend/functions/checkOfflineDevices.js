@@ -3,7 +3,7 @@ import Device from '../models/device.model.js';
 
 const checkOfflineDevices = async() => {
     try{
-        const devices = await Device.find({});
+        const devices = await Device.find({"isOnline": true});
         if(!devices instanceof Array || devices.length === 0){
             return;
         }

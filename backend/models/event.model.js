@@ -1,26 +1,25 @@
 import mongoose from 'mongoose';
 
+const types = ['Irrigation Activation', 'Data Submission', 'Seedling Sow', 'Seedling Ready'];
 const reservoirLevels = ['OK', 'LOW', 'FULL'];
 const waterLevels = ['OK', 'LOW', 'FULL']
 
-const DeviceSchema = new mongoose.Schema({
-    deviceID:{
-        type: String,
+const EventSchema = new mongoose.Schema({
+    device:{
+        type: mongoose.Types.ObjectId,
+        ref: 'Device',
         required: true
     },
-    isOnline:{
-        type: Boolean,
-        default: false
-    },
-    lastUpdate:{
+    eventDate:{
         type: Number,
         required: true,
-        default: 0
+        default: Date.now()
     },
-    owner:{
-        type: mongoose.Types.ObjectId,
-        ref: 'User',
-        required: true
+    eventType:{
+        type: String,
+        enum: types,
+        required: true,
+        default: 'Data Submission'
     },
     temperature:{
         type: Number,
@@ -70,6 +69,6 @@ const DeviceSchema = new mongoose.Schema({
     }
 });
 
-const Device = mongoose.model('Device', DeviceSchema);
+const Event=mongoose.model('Event', EventSchema);
 
-export default Device;
+export default Event;

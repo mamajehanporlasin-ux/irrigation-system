@@ -8,5 +8,6 @@ router.post("/register", userAuthentication, registerNewDevice);
 router.get("/get-my-devices", userAuthentication, getMyDevices);
 router.post("/online", deviceOnline);
 router.put("/update/:deviceDBID", userAuthentication, updateDevice);
+router.post("/set-online", deviceOnline);
 
 export default router;
