@@ -1,172 +1,101 @@
-import React, {useState, useEffect} from 'react';
-import { View, Text, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-import axiosInstance from '../axiosConfig.js';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { MaterialIcons } from '@expo/vector-icons';
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Link } from "expo-router";
 
+export default function LoginScreen() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-const MetricCard = ({ title, value, unit, iconName, color }) => (
-  <View className={`w-1/2 p-2`}>
-    <View className={`flex-row items-center p-3 rounded-xl shadow-sm border border-gray-100 ${color}`}>
-      <MaterialCommunityIcons name={iconName} size={24} color="#374151" />
-      <View className="ml-3">
-        <Text className="text-lg font-bold text-gray-800">{value}{unit}</Text>
-        <Text className="text-xs text-gray-500">{title}</Text>
-      </View>
-    </View>
-  </View>
-);
-
-/**
- * Device Card Component
- */
-const DeviceCard = ({ device }) => {
-  console.log(JSON.stringify(device));
-  const tankLevel = device.tankLevel;
-  const humidity=device.humidity;
-  const isOnline=device.isOnline;
-  const temperature = device.temperature;
-  const soilMoisture=device.soilMoisture;
-  const deviceID=device.deviceID;
-  
-  return (
-    <TouchableOpacity 
-      className="bg-white mx-4 mt-4 p-4 rounded-xl shadow-md border border-gray-100 active:bg-gray-50"
-      onPress={() => console.log(`Device ${device.deviceID} tapped`)} // Action when device is tapped
-      activeOpacity={0.8}
-    >
-      <View className="flex-row justify-between items-start pb-3 mb-3 border-b border-gray-100">
-        <View className="flex-shrink">
-          <Text className="text-xl font-extrabold text-gray-900">{device.deviceID}</Text>
-        </View>
-      </View>
-
-      <View className="flex-row flex-wrap -m-2">
-        <MetricCard 
-          title="Humidity" 
-          value={device.humidity} 
-          unit="%" 
-          iconName="water-percent" 
-          color="bg-blue-50" 
-        />
-        <MetricCard 
-          title="Temperature" 
-          value={device.temperature} 
-          unit="°C" 
-          iconName="temperature-celsius" 
-          color="bg-red-50" 
-        />
-      </View>
-      <View className="flex flex-col w-auto h-auto mx-3 mt-2 hover:bg-blue-200 border border-gray-200">
-        <Text className="text-lg font-extrabold text-gray-900 mx-3 my-2">Field 1</Text>
-        <View className="flex flex-row">
-            <MetricCard
-              title="Water Level" 
-              value={device.isWaterLevelLow1} 
-              unit="" 
-              iconName="water-boiler" 
-              color="bg-cyan-50" 
-            />
-            <MetricCard 
-              title="Soil Moisture" 
-              value={device.soilMoisture1} 
-              unit=" " 
-              iconName="spa" 
-              color="bg-amber-50" 
-            />
-          </View>
-        </View>
-        
-        <View className="flex flex-col w-auto h-auto mx-3 border border-gray-200 hover:bg-blue-200">
-        <Text className="text-lg font-extrabold text-gray-900 mx-3 my-2">Field 2</Text>
-        <View className="flex flex-row">
-            <MetricCard
-              title="Water Level" 
-              value={device.isWaterLevelLow2} 
-              unit="" 
-              iconName="water-boiler" 
-              color="bg-cyan-50" 
-            />
-            <MetricCard 
-              title="Soil Moisture" 
-              value={device.soilMoisture2} 
-              unit=" " 
-              iconName="spa" 
-              color="bg-amber-50" 
-            />
-          </View>
-        </View>
-
-        <View className="flex flex-col w-auto h-auto mx-3 border border-gray-200 hover:bg-blue-200">
-        <Text className="text-lg font-extrabold text-gray-900 mx-3 my-2">Field 3</Text>
-        <View className="flex flex-row">
-            <MetricCard
-              title="Water Level" 
-              value={device.isWaterLevelLow3} 
-              unit="" 
-              iconName="water-boiler" 
-              color="bg-cyan-50" 
-            />
-            <MetricCard 
-              title="Soil Moisture" 
-              value={device.soilMoisture3} 
-              unit=" " 
-              iconName="spa" 
-              color="bg-amber-50" 
-            />
-          </View>
-        </View>
-    </TouchableOpacity>
-  );
-};
-
-/**
- * Main Dashboard Component (The entire screen)
- */
-const IrrigationDashboard = () => {
-  const [data, setData] = useState([]);
-  
-  useEffect(()=>{
-    const func=async()=>{
-      try{
-        const response = await axiosInstance.get("/device/get");
-        if(!response.data.success){
-            console.log(JSON.stringify(response.data.message));
-            setData([]);
-        }else{
-            setData(response.data.data);
-            console.log(JSON.stringify(response.data));
-        }
-      }catch(error){
-        console.error("Data retrieval error:", error.message);
-      }
-    }
-
-    func();
-  },[]);
-
-  const Header = () => (
-    <View className="p-4 bg-white shadow-sm border-b border-gray-100">
-      <Text className="text-3xl font-extrabold text-green-700">Dashboard</Text>
-      <Text className="text-base text-gray-500">Irrigation System Overview</Text>
-    </View>
-  );
+  const handleLogin = () => {
+    console.log("Email:", email);
+    console.log("Password:", password);
+    
+  };
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100">
-      
-      {/* Render the simple header */}
-      <Header />
+    <SafeAreaView className="flex-1 w-full min-w-full bg-white">
+      <KeyboardAvoidingView
+        className="flex-1 justify-center px-6"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <View className="mb-10">
+            <Text className="text-3xl font-bold text-center text-gray-800 mb-2">
+                Arduino based Smart Irrigation System
+            </Text>
+            
+          <Text className="text-center text-gray-500 mt-2">
+            Welcome Back, Login to your account
+          </Text>
+        </View>
 
-      {/* FlatList for efficient, scrollable list of devices */}
-      {data !== null && <FlatList
-        data={data}
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={({ item }) => <DeviceCard device={item} />}
-        contentContainerStyle={{ paddingBottom: 16 }} // Space at the bottom
-      />} 
+        <View className="relative w-full h-auto flex flex-row mb-4">
+            <View className="border border-gray-300 border-l-1 mr-[-3] rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
+                <MaterialIcons name="email" size={30} color="green" />
+            </View>
+          
+          <View className="flex-1 border border-gray-300 border-l-0 rounded-lg px-4 py-1">
+            <TextInput
+                value={email}
+                onChangeText={setEmail}
+                placeholder="Enter your email"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                className="w-full mx-auto text-gray-800"
+            />
+          </View>
+          
+        </View>
+
+        <View className="relative w-full h-auto flex flex-row mb-4">
+            <View className="border border-gray-300 border-l-1 mr-[-3] rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
+                <MaterialIcons name="lock" size={30} color="green" />
+            </View>
+          <View className="flex-1 border border-gray-300 border-l-0 rounded-lg px-4 py-1">
+            <TextInput
+                value={password}
+                onChangeText={setPassword}
+                placeholder="Enter your password"
+                secureTextEntry
+                className="w-full mx-auto text-gray-800"
+            />
+          </View>
+        </View>
+
+        <TouchableOpacity className="self-end mb-6">
+          <Text className="text-blue-600 font-medium">
+            Forgot Password?
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={handleLogin}
+          className="bg-blue-600 py-4 rounded-lg mb-6"
+        >
+          <Text className="text-white text-center font-semibold text-lg">
+            Login
+          </Text>
+        </TouchableOpacity>
+
+        <View className="flex-row justify-center">
+          <Text className="text-gray-600">Don’t have an account? </Text>
+          <Link href="/SignupScreen" asChild>
+            <TouchableOpacity>
+              <Text className="text-blue-600 font-semibold">
+                Sign Up
+              </Text>
+            </TouchableOpacity>
+          </Link>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
-};
-
-export default IrrigationDashboard;
+}

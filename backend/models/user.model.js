@@ -26,25 +26,8 @@ const UserSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    addressDetail:{
+    address:{
         type: String,
-        required: false,
-        default: ""
-    },
-    regCode:{
-        type: Number,
-        required: true
-    },
-    provCode:{
-        type: Number,
-        required: true
-    },
-    citymunCode:{
-        type: Number,
-        required: true
-    },
-    brgyCode:{
-        type: Number,
         required: true
     },
     resetOTP:{

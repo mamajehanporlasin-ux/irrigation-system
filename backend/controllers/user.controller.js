@@ -2,7 +2,7 @@ import User from '../models/user.model.js';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { isUserEmailExisting, isAddressValid } from '../functions/functions.js';
+import { isUserEmailExisting } from '../functions/functions.js';
 import { sendPasswordResetOTPEmail, sendNewPasswordEmail } from '../functions/emailHelper.js';
 
 export const register = async(req, res) =>{
@@ -15,11 +15,7 @@ export const register = async(req, res) =>{
     const mName = req.body.middleName;
     const contactNum = req.body.contactNumber;
     const emailAdd = req.body.emailAddress;
-    const add = req.body.addressDetail;
-    const regCode = req.body.regCode;
-    const provCode= req.body.provCode;
-    const citymunCode=req.body.citymunCode;
-    const brgyCode=req.body.brgyCode;
+    const add = req.body.address;
     const password=req.body.password;
     const confirmPassword=req.body.confirmPassword;
 
@@ -55,8 +51,8 @@ export const register = async(req, res) =>{
         return res.status(200).json({success: false, message: "Passwords must be atleast 8 characters in length"});
     }
 
-    if(!await isAddressValid(regCode, provCode, citymunCode, brgyCode)){
-        return res.status(200).json({success: false, message: "Invalid Address provided!"});
+    if(!add || add.length < 1){
+        return res.status(200).json({success: false, message: "Please provide your address!"});
     }
 
     const salt = Number (process.env.SALT || 10);
@@ -81,12 +77,8 @@ export const register = async(req, res) =>{
         user.middleName=mName;
         user.contactNumber=contactNum;
         user.emailAddress=emailAdd;
-        user.addressDetail=add;
-        user.regCode=regCode;
-        user.provCode=provCode;
-        user.citymunCode=citymunCode;
-        user.brgyCode=brgyCode;
-
+        user.address=add;
+        
         await user.save({session});
 
 
@@ -119,11 +111,7 @@ export const update = async(req, res) =>{
     const fName = req.body.firstName;
     const mName = req.body.middleName;
     const contactNum = req.body.contactNumber;
-    const add = req.body.addressDetail;
-    const regCode = req.body.regCode;
-    const provCode= req.body.provCode;
-    const citymunCode=req.body.citymunCode;
-    const brgyCode=req.body.brgyCode;
+    const add = req.body.address;
 
     if(!emailAddress){
         return res.status(200).json({success: false, message: "Invalid Email Address!"});
@@ -143,8 +131,8 @@ export const update = async(req, res) =>{
         return res.status(200).json({success: false, message: "Invalid Contact Number!"});
     }
 
-    if(!await isAddressValid(regCode, provCode, citymunCode, brgyCode)){
-        return res.status(200).json({success: false, message: "Invalid Address provided!"});
+    if(!add || add.length < 1){
+        return res.status(200).json({success: false, message: "Please provide your address!"});
     }
 
     if(!mongoose.Types.ObjectId.isValid(id)){
@@ -171,10 +159,6 @@ export const update = async(req, res) =>{
         onRecordUser.contactNumber=contactNum;
         onRecordUser.emailAddress=emailAddress;
         onRecordUser.address=add;
-        onRecordUser.regCode=regCode;
-        onRecordUser.provCode=provCode;
-        onRecordUser.citymunCode=citymunCode;
-        onRecordUser.brgyCode=brgyCode;
 
         const updatedUser =await User.findByIdAndUpdate(id, onRecordUser, {new:true, session});
 
