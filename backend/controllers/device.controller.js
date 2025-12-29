@@ -105,6 +105,7 @@ export const updateDevice = async(req, res)=>{
 
     const session = await mongoose.startSession();
     try{
+        session.startTransaction();
         const onRecordUser = await User.findById(id);
         if(!onRecordUser){
             return res.status(200).json({success: false, message: "Authentication Failed!"});
@@ -119,12 +120,16 @@ export const updateDevice = async(req, res)=>{
             return res.status(200).json({success: false, message: "Device ID is already in use!"});
         }
 
-        session.startTransaction();
-
         onRecordDevice.deviceID = deviceID;
         
-        const updatedDevice =await Device.findByIdAndUpdate(deviceDBID, onRecordDevice, {runValidators: true, new: true, session});
+        const updatedDevice = await Device.findByIdAndUpdate(deviceDBID, onRecordDevice, {runValidators: true, new: true, session});
+        if(!updatedDevice || updatedDevice === undefined){
+            console.log("Error updating deviceID...");
+            return res.status(200).json({success: false, message: "Device ID is already in use!"});
+        }
         await session.commitTransaction();
+
+        
         res.status(200).json({success: true, data: [updatedDevice]});
 
     }catch(error){
@@ -214,5 +219,42 @@ export const deviceOnline = async(req, res) =>{
         res.status(500).json({success: false, message:"Server Error"});
     }
     
+    return res;
+}
+
+export const getADevice = async(req, res) =>{
+    if(!req.body){
+        return res.status(400).json({success: false, message: "Invalid values!"});
+    }
+
+    const id=req.body._id;
+    const deviceID=req.params.deviceID;
+
+    if(!deviceID || deviceID.length<1){
+        return res.status(200).json({success: false, message: "Invalid Device ID!"});
+    }
+    
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(200).json({success: false, message: "Authentication Failed!"});
+    }
+
+    try{
+        const onRecordUser = await User.findById(id);
+        if(!onRecordUser){
+            return res.status(200).json({success: false, message: "Authentication Failed!"});
+        }
+
+        const device = await Device.find({"deviceID": deviceID});
+        if(!device){
+            res.status(500).json({success: false, message:"No device found!"});
+        }else if(device[0].owner.toString() != id){
+            res.status(500).json({success: false, message:"Authentication Failed!"});
+        }else{
+            res.status(200).json({success: true, data: device});
+        }
+    }catch(error){
+        res.status(500).json({success: false, message:"Server Error"});
+    }
+
     return res;
 }

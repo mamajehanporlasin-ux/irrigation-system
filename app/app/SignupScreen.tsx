@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -11,8 +11,7 @@ import {
 import loadingOverlay from "./components/LoadingOverlay.jsx";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
-import { Picker } from "@react-native-picker/picker";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import axiosInstance from "../axiosConfig.js";
 import Toast from "react-native-toast-message";
 
@@ -48,32 +47,19 @@ export default function SignupScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [regionSelections, setRegionSelections] = useState([]);
-  const [provinceSelections, setProvinceSelections] = useState([]);
-  const [municipalitySelections, setMunicipalitySelections] = useState([]);
-  const [barangaySelections, setBarangaySelections] = useState([]);
-
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSignup = () => {
-    console.log({
-      email,
-      firstName,
-      middleName,
-      lastName,
-      contact,
-      address,
-      password,
-      confirmPassword,
-    });
-
-
+  const handleSignup = async() => {
+    setIsLoading(true);
+    
     if(!address || address.length<1){
       Toast.show({
         type: 'error',
         text1: '❌ Invalid Address!',
         text2: 'Please Input your Address!'
       });
+      setIsLoading(false);
+      return;
     }
 
     if(!confirmPassword || confirmPassword.length<1){
@@ -82,6 +68,8 @@ export default function SignupScreen() {
         text1: '❌ Invalid Password Confirmation!',
         text2: 'Please Confirm your Password'
       });
+      setIsLoading(false);
+      return;
     }
     if(password !== confirmPassword ){
       Toast.show({
@@ -89,6 +77,8 @@ export default function SignupScreen() {
         text1: '❌ Invalid Password!',
         text2: 'Password mismatched! please confirm your password again'
       });
+      setIsLoading(false);
+      return;
     }
     if(!password || password.length<1){
       Toast.show({
@@ -96,12 +86,16 @@ export default function SignupScreen() {
         text1: '❌ Invalid Password!',
         text2: 'Please input your Password'
       });
+      setIsLoading(false);
+      return;
     }else if(password.length<8){
       Toast.show({
         type: 'error',
         text1: '❌ Invalid Password!',
         text2: 'Password should be atleast 8 characters long'
       });
+      setIsLoading(false);
+      return;
     }
     if(!contact || contact.length<1){
       Toast.show({
@@ -109,6 +103,8 @@ export default function SignupScreen() {
         text1: '❌ Invalid Contact Number!',
         text2: 'Please input your Contact Number'
       });
+      setIsLoading(false);
+      return;
     }
     if(!lastName || lastName.length<1){
       Toast.show({
@@ -116,6 +112,8 @@ export default function SignupScreen() {
         text1: '❌ Invalid Last Name!',
         text2: 'Please input your Last Name'
       });
+      setIsLoading(false);
+      return;
     }
     if(!middleName || middleName.length<1){
       Toast.show({
@@ -123,6 +121,8 @@ export default function SignupScreen() {
         text1: '❌ Invalid Middle Name!',
         text2: 'Please input your Middle Name'
       });
+      setIsLoading(false);
+      return;
     }
     if(!firstName || firstName.length<1){
       Toast.show({
@@ -130,6 +130,8 @@ export default function SignupScreen() {
         text1: '❌ Invalid First Name!',
         text2: 'Please input your First Name'
       });
+      setIsLoading(false);
+      return;
     }
     if(!email || email.length<1){
       Toast.show({
@@ -137,7 +139,45 @@ export default function SignupScreen() {
         text1: '❌ Invalid Email!',
         text2: 'Please input your email address'
       });
+      setIsLoading(false);
+      return;
     }
+
+    try{
+      const data={
+        "emailAddress": email,
+        "firstName": firstName,
+        "middleName": middleName,
+        "lastName": lastName,
+        "contactNumber": contact,
+        "address": address,
+        "password": password,
+        "confirmPassword": confirmPassword
+      }
+      const response = await axiosInstance.post("/user/register", data, {withCredentials: true});
+        if(!response.data.success){
+            Toast.show({
+              type: 'error',
+              text1: '❌ Error while registering new User Account!',
+              text2: response.data.message
+            });
+        }else{
+            Toast.show({
+              type: 'success',
+              text1: '✅ User Account registered!',
+              text2: ""
+            });
+            router.push('/');
+        }
+    }catch(error){
+      console.log("Error while registering new User Account! - "+error.message);
+      Toast.show({
+        type: 'error',
+        text1: '❌ Error while registering new User Account!',
+        text2: error.message
+      });
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -214,7 +254,6 @@ export default function SignupScreen() {
             </Text>
           </TouchableOpacity>
 
-          {/* Login link */}
           <View className="flex-row justify-center mb-10">
             <Text className="text-gray-600">Already have an account? </Text>
               <Link href="/" asChild>

@@ -1,4 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import { BackHandler } from "react-native";
+import { useFocusEffect } from "expo-router";
+import React, {useState, useEffect, useCallback} from 'react';
 import { View, Text, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
@@ -17,9 +19,6 @@ const MetricCard = ({ title, value, unit, iconName, color }) => (
   </View>
 );
 
-/**
- * Device Card Component
- */
 const DeviceCard = ({ device }) => {
   console.log(JSON.stringify(device));
   const tankLevel = device.tankLevel;
@@ -120,9 +119,6 @@ const DeviceCard = ({ device }) => {
   );
 };
 
-/**
- * Main Dashboard Component (The entire screen)
- */
 const IrrigationDashboard = () => {
   const [data, setData] = useState([]);
   
@@ -145,8 +141,18 @@ const IrrigationDashboard = () => {
     //func();
   },[]);
 
+  useFocusEffect(
+    useCallback(() => {
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        () => true
+      );
+
+      return () => subscription.remove();
+    }, [])
+  );
   const Header = () => (
-    <View className="p-4 bg-white shadow-sm border-b border-gray-100">
+    <View className="p-4 bg-white shadow-sm border-b border-gray-100 pt-10">
       <Text className="text-3xl font-extrabold text-green-700">Dashboard</Text>
       <Text className="text-base text-gray-500">Irrigation System Overview</Text>
     </View>

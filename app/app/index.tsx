@@ -9,20 +9,81 @@ import {
 } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { Link, router, Redirect } from "expo-router";
+import loadingOverlay from "./components/LoadingOverlay";
+import axiosInstance from "@/axiosConfig";
+import Toast from "react-native-toast-message";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    console.log("Email:", email);
-    console.log("Password:", password);
-    
+  const { token, isLoading: authLoading, login } = useAuth();
+
+  if (authLoading) return null;
+
+  if (token) {
+    return <Redirect href="/(tabs)/Home" />;
+  }
+
+  const handleLogin = async() => {
+      setIsLoading(true);
+        if(!email||email.length<1){
+            Toast.show({
+                type: 'error',
+                text1: '❌ Invalid Email Address!',
+                text2: 'Please Input your Email Address'
+            });
+            setIsLoading(false);
+            return;
+        }
+        if(!password||password.length<1){
+            Toast.show({
+                type: 'error',
+                text1: '❌ Invalid Password!',
+                text2: 'Please Input your Password'
+            });
+            setIsLoading(false);
+            return;
+        }
+        try{
+        const data={
+            "emailAddress": email,
+            "password": password
+        }
+        const response = await axiosInstance.post("/user/login", data, {withCredentials: true});
+            if(!response.data.success){
+                Toast.show({
+                type: 'error',
+                text1: '❌ Error while trying to login!',
+                text2: response.data.message
+                });
+            }else{
+                Toast.show({
+                type: 'success',
+                text1: '✅ Login successfully!',
+                text2: ""
+                });
+                await login(response.data.token);
+                router.push("/(tabs)/Home");
+                router.replace('/(tabs)/Home');
+            }
+        }catch(error){
+            console.log("Error while logging in! - "+error.message);
+            Toast.show({
+                type: 'error',
+                text1: '❌ Error while logging in!',
+                text2: error.message
+            });
+        }
+        setIsLoading(false);
   };
 
   return (
     <SafeAreaView className="flex-1 w-full min-w-full bg-white">
+      {isLoading && loadingOverlay()}
       <KeyboardAvoidingView
         className="flex-1 justify-center px-6"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -70,11 +131,13 @@ export default function LoginScreen() {
           </View>
         </View>
 
-        <TouchableOpacity className="self-end mb-6">
-          <Text className="text-blue-600 font-medium">
-            Forgot Password?
-          </Text>
-        </TouchableOpacity>
+        <Link href="/OTPRequestScreen" asChild>
+          <TouchableOpacity className="self-end mb-6">
+            <Text className="text-blue-600 font-medium">
+              Forgot Password?
+            </Text>
+          </TouchableOpacity>
+        </Link>
 
         <TouchableOpacity
           onPress={handleLogin}

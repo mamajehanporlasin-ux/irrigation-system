@@ -40,7 +40,7 @@ app.get("/", (req, res)=>{
 
 setInterval(checkOfflineDevices, 30000);
 
-app.listen(PORT, ()=>{
+app.listen(PORT, '0.0.0.0', ()=>{
     dbConnection();
     console.log("server started at http://localhost:"+PORT);
 });
