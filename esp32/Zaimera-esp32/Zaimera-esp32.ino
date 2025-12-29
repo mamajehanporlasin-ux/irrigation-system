@@ -4,12 +4,31 @@
 #include <WiFiClientSecure.h>
 
 
-const char* WIFI_SSID = "WIFIALIABO 2.4G";
-const char* WIFI_PASS = "KAPITANDANDAN";
+const char* WIFI_SSID = "Channel-2.5Ghz";
+const char* WIFI_PASS = "@Lbiga$iat0n";
 
-const char* API_URL = "https://test-project-xpyo.onrender.com";
+const char* API_URL = "https://irrigation-system-oazw.onrender.com/api";
 
 const int JSON_REQUEST_SIZE = 512 + (64 * 15);
+
+const String deviceID="10001-01A";
+
+float temperature;
+float humidity;
+
+String reservoirLevel;
+bool soilMoisture1;
+bool soilMoisture2;
+bool soilMoisture3;
+
+String waterLevel1;
+String waterLevel2;
+String waterLevel3;
+
+String arduinoMessage;
+
+long previousOnlineUpdate;
+long currentTime;
 
 void wifiConnect() {
     Serial.print("Connecting to WiFi: ");
@@ -76,7 +95,16 @@ void requestAPIGET(String endPoint) {
 
 void sendOnlinePing(){
     DynamicJsonDocument doc(JSON_REQUEST_SIZE);
-    doc["deviceID"]="10000-01";
+    doc["deviceID"]=deviceID;
+    doc["temperature"]=temperature;
+    doc["humidity"]=humidity;
+    doc["reservoirLevel"]=reservoirLevel;
+    doc["soilMoisture1"]=soilMoisture1;
+    doc["soilMoisture2"]=soilMoisture2;
+    doc["soilMoisture3"]=soilMoisture3;
+    doc["waterLevel1"]=waterLevel1;
+    doc["waterLevel2"]=waterLevel2;
+    doc["waterLevel3"]=waterLevel3;
     sendAPIPOST("/device/online", doc);
 }
 
@@ -91,11 +119,6 @@ void sendAPIPOST(String endPoint, DynamicJsonDocument doc){
 
     String jsonRequest;
     serializeJson(doc, jsonRequest);
-
-    Serial.print("POST URL: ");
-    Serial.println(urlFull);
-    Serial.print("JSON Body: ");
-    Serial.println(jsonRequest);
 
     HTTPClient http;
 
@@ -141,12 +164,45 @@ void sendAPIPOST(String endPoint, DynamicJsonDocument doc){
 void setup() {
   Serial.begin(115200);
   delay(100);
+  Serial2.begin(9600, SERIAL_8N1, 16, 17);
   wifiConnect();
+
+  temperature=0;
+  humidity=0;
+
+    reservoirLevel="OK";
+    soilMoisture1=true;
+    soilMoisture2=true;
+    soilMoisture3=true;
+
+    waterLevel1="OK";
+    waterLevel2="OK";
+    waterLevel3="OK";
+
+    arduinoMessage="";
+    previousOnlineUpdate=0;
+    currentTime=0;
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  requestAPIGET("/");
-  sendOnlinePing();
-  delay(5000);
+    if(Serial2.available()){
+        String message = Serial2.readStringUntil('\n');
+        Serial.println("From arduino: "+message);
+        if(!arduinoMessage.equals(message)){
+            //int firstComma = message.indexOf(',');
+            // int secondComma = message.indexOf(',', firstComma + 1);
+            //value1 = message.substring(0, firstComma).toInt();
+            //value2 = message.substring(firstComma + 1, secondComma).toInt();
+            //value3 = message.substring(secondComma + 1).toInt();
+        }
+            
+    }
+
+    currentTime=millis();
+  if((currentTime-previousOnlineUpdate) >= 6000){
+    sendOnlinePing();
+    previousOnlineUpdate=currentTime;
+  }
+  
+  delay(2000);
 }

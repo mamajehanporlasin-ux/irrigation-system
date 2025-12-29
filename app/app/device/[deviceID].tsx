@@ -35,9 +35,13 @@ const DeviceDetails =()=>{
     const [newDeviceID, setNewDeviceID] = useState("");
     
     useEffect(()=>{
-        setIsLoading(true);
-        reloadData();
-        setIsLoading(false);
+        const interval = setInterval(() => {
+            setIsLoading(true);
+            reloadData();
+            setIsLoading(false);
+        }, 20000);
+        
+        return () => clearInterval(interval);
     },[]);
 
     const reloadData =async()=>{

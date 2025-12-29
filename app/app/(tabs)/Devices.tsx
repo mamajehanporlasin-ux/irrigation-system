@@ -27,9 +27,13 @@ const DevicesTab =()=>{
     const isFocused = useIsFocused();
 
     useEffect(()=>{
-        setIsLoading(true);
-        reloadData();
-        setIsLoading(false);
+        const interval = setInterval(() => {
+            setIsLoading(true);
+            reloadData();
+            setIsLoading(false);
+        }, 20000);
+        
+        return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
