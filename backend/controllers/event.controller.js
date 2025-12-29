@@ -47,12 +47,11 @@ export const submitData = async(req, res)=>{
         soilMoisture3=false;
     }
 
-
-
     const session = await mongoose.startSession();
     try{
         const onRecordDevice = await Device.find({"deviceID": deviceID});
-        if(!onRecordDevice){
+        console.log("data: "+JSON.stringify(onRecordDevice));
+        if(!onRecordDevice || onRecordDevice.length<1){
             return res.status(200).json({success: false, message: "Device not found!"});
         }
         
