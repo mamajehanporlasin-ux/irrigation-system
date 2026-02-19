@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
-  Modal
+  Modal,
+  Image
 } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -14,6 +15,7 @@ import loadingOverlay from "../components/LoadingOverlay";
 import axiosInstance from "@/axiosConfig";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../../context/AuthContext";
+import HeaderComponent from "../components/Header";
 
 const ProfileTab =()=>{
     const [isLoading, setIsLoading] = useState(false);
@@ -140,15 +142,10 @@ const ProfileTab =()=>{
         <SafeAreaView className="flex-1 bg-gray-100">
             {isLoading && loadingOverlay()}
             <ScrollView
-                      showsVerticalScrollIndicator={false}
-                      className="w-full flex flex-col"
+                showsVerticalScrollIndicator={false}
+                className="w-full flex flex-col"
             >
-                
-                <View className="p-4 bg-white shadow-sm border-b border-gray-100 pt-10">
-                    <Text className="text-3xl font-extrabold text-green-700">Profile</Text>
-                    <Text className="text-base text-gray-500">view and/or update your personal Profile</Text>
-                </View>
-
+                <HeaderComponent />
                 <View className="px-7 py-10 mx-5 my-5 bg-white shadow-sm border-b border-gray-100 rounded-lg">
                     <View className="flex flex-row w-full h-auto gap-4 my-2">
                         <Text className="text-black font-bold text-xl">Email:</Text>
@@ -192,7 +189,7 @@ const ProfileTab =()=>{
                     <View className="flex-1 mx-auto w-full h-auto gap-4 mt-10 items-end">
                         <TouchableOpacity
                             onPress={handleLogoutPress}
-                            className="flex flex-row gap-2 bg-gray-600 py-4 px-8 rounded-lg mx-6 w-fit"
+                            className="flex flex-col gap-2 bg-gray-600 py-4 px-8 rounded-3xl mx-5 w-fit items-center"
                         >
                             <MaterialIcons name={"logout"} size={28} color="white" />
                             <Text className="text-white text-center font-semibold text-lg">

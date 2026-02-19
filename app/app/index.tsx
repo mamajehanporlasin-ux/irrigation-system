@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,26 +6,69 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Image
 } from "react-native";
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Entypo } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, router, Redirect } from "expo-router";
 import loadingOverlay from "./components/LoadingOverlay";
 import axiosInstance from "@/axiosConfig";
 import Toast from "react-native-toast-message";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/images/logo.png";
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { token, isLoading: authLoading, login } = useAuth();
+  const { token, isLoading: authLoading, login, logout } = useAuth();
+  
+  
+  /*if(token){
+    return <Redirect href="/(tabs)/Devices" />;
+  }*/
+  useEffect(() => {
+    
+    const verifyToken = async () => {
+      if (token) {
+        try {
+          const response = await axiosInstance.post("/user/check-token", {}, { withCredentials: true });
+          if (!response.data.success) {
+            await logout();
+          }else{
+            await login(token);
+            router.push("/(tabs)/Devices");
+            router.replace('/(tabs)/Devices');
+          }
+        } catch (error) {
+          console.log("Token validation failed:", error.message);
+        }
+      }
+    };
+    verifyToken();
+  }, [token]);
+  
 
-  if (authLoading) return null;
+  if (authLoading) 
+      return null;
 
-  if (token) {
-    return <Redirect href="/(tabs)/Home" />;
+  const isTokenValid= async() =>{
+      setIsLoading(true);
+      try{
+        const data={}
+        const response = await axiosInstance.post("/user/check-token", data, {withCredentials: true});
+          if(response.data.success){
+            setIsLoading(false);
+            //return <Redirect href="/(tabs)/Devices" />;
+            await login(token);
+            router.push("/(tabs)/Devices");
+            router.replace('/(tabs)/Devices');
+          }
+        }catch(error){
+            console.log("Error while Checking for token validity! - "+error.message);
+        }
+        setIsLoading(false);
   }
 
   const handleLogin = async() => {
@@ -67,8 +110,8 @@ export default function LoginScreen() {
                 text2: ""
                 });
                 await login(response.data.token);
-                router.push("/(tabs)/Home");
-                router.replace('/(tabs)/Home');
+                router.push("/(tabs)/Devices");
+                router.replace('/(tabs)/Devices');
             }
         }catch(error){
             console.log("Error while logging in! - "+error.message);
@@ -81,6 +124,8 @@ export default function LoginScreen() {
         setIsLoading(false);
   };
 
+  
+
   return (
     <SafeAreaView className="flex-1 w-full min-w-full bg-white">
       {isLoading && loadingOverlay()}
@@ -89,7 +134,10 @@ export default function LoginScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <View className="mb-10">
-            <Text className="text-3xl font-bold text-center text-gray-800 mb-2">
+            <View className="flex w-full h-auto items-center mb-10">
+              <Image source={logo} style={{ width: 150, height: 150 }}  className="p-5 border-2 border-teal-500 rounded-full"/>
+            </View>
+            <Text className="text-3xl font-bold text-center text-black mb-2">
                 Arduino based Smart Irrigation System
             </Text>
             
@@ -99,11 +147,11 @@ export default function LoginScreen() {
         </View>
 
         <View className="relative w-full h-auto flex flex-row mb-4">
-            <View className="border border-gray-300 border-l-1 mr-[-3] rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
-                <MaterialIcons name="email" size={30} color="green" />
+            <View className="border border-blue-300 border-l-1 mr-[-3] rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
+                <Entypo name="email" size={30} color="#ffa500" />
             </View>
           
-          <View className="flex-1 border border-gray-300 border-l-0 rounded-lg px-4 py-1">
+          <View className="flex-1 border border-blue-300 border-l-0 rounded-lg px-4 py-1">
             <TextInput
                 value={email}
                 onChangeText={setEmail}
@@ -117,10 +165,10 @@ export default function LoginScreen() {
         </View>
 
         <View className="relative w-full h-auto flex flex-row mb-4">
-            <View className="border border-gray-300 border-l-1 mr-[-3] rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
-                <MaterialIcons name="lock" size={30} color="green" />
+            <View className="border border-blue-300 border-l-1 mr-[-3] rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
+                <MaterialIcons name="lock" size={30} color="#ffa500" />
             </View>
-          <View className="flex-1 border border-gray-300 border-l-0 rounded-lg px-4 py-1">
+          <View className="flex-1 border border-blue-300 border-l-0 rounded-lg px-4 py-1">
             <TextInput
                 value={password}
                 onChangeText={setPassword}
@@ -141,7 +189,7 @@ export default function LoginScreen() {
 
         <TouchableOpacity
           onPress={handleLogin}
-          className="bg-blue-600 py-4 rounded-lg mb-6"
+          className="bg-teal-800 py-4 rounded-lg mb-6"
         >
           <Text className="text-white text-center font-semibold text-lg">
             Login

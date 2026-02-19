@@ -4,21 +4,20 @@
 #include <WiFiClientSecure.h>
 
 
-const char* WIFI_SSID = "Galaxy A54";
-const char* WIFI_PASS = "qwerty123";
+const char* WIFI_SSID = "Channel-2.5Ghz";
+const char* WIFI_PASS = "@Lbiga$iat0n";
 
 const char* API_URL = "https://xlgjn5k1-5000.asse.devtunnels.ms/api";
 
 const int JSON_REQUEST_SIZE = 512 + (64 * 15);
 
-const String deviceID="12345";
+const String deviceID="10001a";
 
 float temperature;
 float humidity;
-int reservoirLevel;
-int waterLevel1;
-int waterLevel2;
-int waterLevel3;
+int tankLevel;
+int isRaining;
+int isIrrigating;
 
 String arduinoMessage;
 
@@ -98,14 +97,14 @@ void requestAPIGET(String endPoint) {
 }
 
 void sendOnlinePing(){
+    Serial.println("Sending post");
     DynamicJsonDocument doc(JSON_REQUEST_SIZE);
     doc["deviceID"]=deviceID;
     doc["temperature"]=temperature;
     doc["humidity"]=humidity;
-    doc["reservoirLevel"]=reservoirLevel;
-    doc["waterLevel1"]=waterLevel1;
-    doc["waterLevel2"]=waterLevel2;
-    doc["waterLevel3"]=waterLevel3;
+    doc["tankLevel"]=tankLevel;
+    doc["isRaining"]=isRaining;
+    doc["isIrrigating"]=isIrrigating;
     sendAPIPOST("/device/online", doc);
 }
 
@@ -114,10 +113,9 @@ void sendDataSubmission(){
     doc["deviceID"]=deviceID;
     doc["temperature"]=temperature;
     doc["humidity"]=humidity;
-    doc["reservoirLevel"]=reservoirLevel;
-    doc["waterLevel1"]=waterLevel1;
-    doc["waterLevel2"]=waterLevel2;
-    doc["waterLevel3"]=waterLevel3;
+    doc["tankLevel"]=tankLevel;
+    doc["isRaining"]=isRaining;
+    doc["isIrrigating"]=isIrrigating;
     sendAPIPOST("/event/submit-data", doc);
 }
 
@@ -184,10 +182,6 @@ void setup() {
 
   temperature=0;
   humidity=0;
-  reservoirLevel=0;
-  waterLevel1=0;
-  waterLevel2=0;
-  waterLevel3=0;
   arduinoMessage="";
   previousOnlineUpdate=0;
   currentTime=0;
@@ -195,6 +189,9 @@ void setup() {
   connectedToWifi=false;
 
   loopCounter=0;
+  tankLevel=0;
+  isRaining=0;
+  isIrrigating=0;
   previousDataSubmit=0;
 }
 
@@ -206,21 +203,18 @@ void loop() {
       int secondComma = message.indexOf(',', firstComma + 1);
       int thirdComma = message.indexOf(',', secondComma+1);
       int fourthComma = message.indexOf(',', thirdComma+1);
-      int fifthComma= message.indexOf(",", fourthComma+1);
 
       humidity = message.substring(0, firstComma).toFloat();
-      Serial.println(humidity);
+      //Serial.println(humidity);
       temperature=message.substring(firstComma+1, secondComma).toFloat();
-      Serial.println(temperature);
-      reservoirLevel=message.substring(secondComma+1, thirdComma).toInt();
-      Serial.println(reservoirLevel);
-      waterLevel1=message.substring(thirdComma+1, fourthComma).toInt();
-      Serial.println(waterLevel1);
-      waterLevel2=message.substring(fourthComma+1, fifthComma).toInt();
-      Serial.println(waterLevel2);
-      waterLevel3=message.substring(fifthComma+1).toInt();
-      Serial.println(waterLevel3);
-      //Serial.println("From arduino: "+message);
+      //Serial.println(temperature);
+      tankLevel=message.substring(secondComma+1, thirdComma).toInt();
+      //Serial.println(tankLevel);
+      isRaining=message.substring(thirdComma+1, fourthComma).toInt();
+      //Serial.println(isRaining);
+      isIrrigating=message.substring(fourthComma+1).toInt();
+      //Serial.println(isIrrigating);
+      Serial.println("From arduino: "+message);
       arduinoMessage=message;
       loopCounter=0;
     }else{
@@ -230,13 +224,15 @@ void loop() {
 
   currentTime=millis();
   if((currentTime-previousOnlineUpdate) >= 6000){
+    Serial.println("Check!");
+    
       sendOnlinePing();
     
     previousOnlineUpdate=currentTime;
   }
 
   if(currentTime-previousDataSubmit >= 43200000 || previousDataSubmit<=0){
-    sendDataSubmission();
+      sendDataSubmission();
     previousDataSubmit=currentTime;
   }
   

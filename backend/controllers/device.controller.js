@@ -1,6 +1,7 @@
 import Device from "../models/device.model.js";
 import User from "../models/user.model.js";
 import { isDeviceIDExisting } from "../functions/functions.js";
+import { isDateValid } from "../functions/functions.js";
 
 import mongoose from "mongoose";
 
@@ -121,6 +122,12 @@ export const updateDevice = async(req, res)=>{
         }
 
         onRecordDevice.deviceID = deviceID;
+        if(!("field1CropAlertDate" in onRecordDevice)){
+            onRecordDevice.field1CropAlertDate = -1;
+        }
+        if(!("field2CropAlertDate" in onRecordDevice)){
+            onRecordDevice.field2CropAlertDate = -1;
+        }
         
         const updatedDevice = await Device.findByIdAndUpdate(deviceDBID, onRecordDevice, {runValidators: true, new: true, session});
         if(!updatedDevice || updatedDevice === undefined){
@@ -153,13 +160,14 @@ export const deviceOnline = async(req, res) =>{
     var temperature= req.body.temperature;
     var humidity=req.body.humidity;
     var reservoirLevel=req.body.reservoirLevel;
-    var soilMoisture1=req.body.soilMoisture1;
-    var soilMoisture2=req.body.soilMoisture2;
-    var soilMoisture3=req.body.soilMoisture3;
     const waterLevel1=req.body.waterLevel1;
     const waterLevel2=req.body.waterLevel2;
     const waterLevel3=req.body.waterLevel3;
     
+    var w1="LOW";
+    var w2="LOW";
+    var w3="LOW";
+
     if(!deviceID){
         return res.status(200).json({success: false, message: "Invalid Device ID!"});
     }
@@ -172,21 +180,38 @@ export const deviceOnline = async(req, res) =>{
         humidity=0;
     }
 
-    if(!reservoirLevel){
+    if(!reservoirLevel || reservoirLevel < 4 ){
         reservoirLevel='LOW';
+    }else if(reservoirLevel > 18){
+        reservoirLevel="FULL";
+    }else{
+        reservoirLevel="OK";
     }
 
-    if(typeof soilMoisture1 !== "boolean"){
-        soilMoisture1=false;
+    if(waterLevel1==2){
+        w1="FULL";
+    }else if(waterLevel1==1){
+        w1="OK";
+    }else{
+        w1="LOW";
     }
 
-    if(typeof soilMoisture2 !== "boolean"){
-        soilMoisture2=false;
+    if(waterLevel2==2){
+        w2="FULL";
+    }else if(waterLevel2==1){
+        w2="OK";
+    }else{
+        w2="LOW";
     }
 
-    if(typeof soilMoisture3 !== "boolean"){
-        soilMoisture3=false;
+    if(waterLevel3==2){
+        w3="FULL";
+    }else if(waterLevel3==1){
+        w3="OK";
+    }else{
+        w3="LOW";
     }
+
 
     const session = await mongoose.startSession();
     try{
@@ -202,12 +227,9 @@ export const deviceOnline = async(req, res) =>{
             device.temperature=temperature;
             device.humidity=humidity;
             device.reservoirLevel=reservoirLevel;
-            device.soilMoisture1=soilMoisture1;
-            device.soilMoisture2=soilMoisture2;
-            device.soilMoisture3=soilMoisture3;
-            device.waterLevel1=waterLevel1;
-            device.waterLevel2=waterLevel2;
-            device.waterLevel3=waterLevel3;
+            device.waterLevel1=w1;
+            device.waterLevel2=w2;
+            device.waterLevel3=w3;
 
             const updatedDevice = await Device.findByIdAndUpdate(device._id, device, {runValidators: true, new: true, session});
             await session.commitTransaction();
@@ -217,6 +239,8 @@ export const deviceOnline = async(req, res) =>{
     }catch(error){
         console.log(error.message);
         res.status(500).json({success: false, message:"Server Error"});
+    }finally{
+        await session.endSession();
     }
     
     return res;
@@ -253,8 +277,135 @@ export const getADevice = async(req, res) =>{
             res.status(200).json({success: true, data: device});
         }
     }catch(error){
+        console.log("An error occured retrieving Device! - "+error.message);
         res.status(500).json({success: false, message:"Server Error"});
     }
 
+    return res;
+}
+
+export const getNumberOfDevicesOnline = async (req, res) =>{
+    if(!req.body){
+        return res.status(400).json({success: false, message: "Invalid values!"});
+    }
+
+    const ownerId=req.body._id;   
+    if(!mongoose.Types.ObjectId.isValid(ownerId)){
+        return res.status(200).json({success: false, message: "Authentication Failed!"});
+    }
+
+    try{
+        const onRecordUser = await User.findById(ownerId);
+        if(!onRecordUser){
+            return res.status(200).json({success: false, message: "Authentication Failed!"});
+        }
+
+        const response = await Device.aggregate([
+            {
+                $match: {
+                owner: onRecordUser._id
+                }
+            },
+            {
+                $group: {
+                _id: null,
+                online: {
+                    $sum: {
+                    $cond: [{ $eq: ["$isOnline", true] }, 1, 0]
+                    }
+                },
+                offline: {
+                    $sum: {
+                    $cond: [{ $eq: ["$isOnline", false] }, 1, 0]
+                    }
+                }
+                }
+            },
+            {
+                $project: {
+                _id: 0,
+                online: 1,
+                offline: 1
+                }
+            }
+            ]);
+
+        if(!response || response.length<1){
+            res.status(500).json({success: false, message:"No device found!"});
+        }else{
+            console.log("response: "+JSON.stringify(response));
+            res.status(200).json({success: true, data: response});
+        }
+
+    }catch(error){
+        console.log("An error occured retrieving Device! - "+error.message);
+        res.status(500).json({success: false, message:"Server Error"});
+    }
+
+    return res;
+}
+
+export const setDeviceAlertDate = async(req, res) =>{
+    if(!req.body){
+        return res.status(400).json({success: false, message: "Invalid values!"});
+    }
+
+    const deviceDBID=req.body.deviceDBID;
+    const id=req.body._id;
+    const inputDate=req.body.inputDate;
+    const fieldNumber=req.body.fieldNumber;
+
+    if(!mongoose.Types.ObjectId.isValid(deviceDBID)){
+        return res.status(200).json({success: false, message: "Invalid Device DB ID!"});
+    }
+
+    if(!mongoose.Types.ObjectId.isValid(id)){
+        return res.status(200).json({success: false, message: "Authentication Failed!"});
+    }
+
+    if(!inputDate || !isDateValid(inputDate)){
+        return res.status(200).json({success: false, message: "Invalid Alert Date!"});
+    }
+
+    if(typeof fieldNumber !== 'number' || fieldNumber<1||fieldNumber>2){
+        return res.status(200).json({success: false, message: "Invalid field to set Alert Date!"});
+    }
+
+    const session = await mongoose.startSession();
+    try{
+        session.startTransaction();
+        const onRecordUser = await User.findById(id);
+        if(!onRecordUser){
+            return res.status(200).json({success: false, message: "Authentication Failed!"});
+        }
+
+        const onRecordDevice = await Device.findById(deviceDBID);
+        if(!onRecordDevice){
+            return res.status(200).json({success: false, message: "Invalid Device DB ID!"});
+        }
+
+        if(fieldNumber==1){
+            onRecordDevice.field1CropAlertDate=new Date(inputDate);
+        }else if(fieldNumber == 2){
+            onRecordDevice.field2CropAlertDate=new Date(inputDate);
+        }
+        
+        const updatedDevice = await Device.findByIdAndUpdate(deviceDBID, onRecordDevice, {runValidators: true, new: true, session});
+        if(!updatedDevice || updatedDevice === undefined){
+            console.log("Error updating field Alert Date...");
+            return res.status(200).json({success: false, message: "An error occured while setting-up field Alert Date!"});
+        }
+        await session.commitTransaction();
+
+        res.status(200).json({success: true, data: [updatedDevice]});
+
+    }catch(error){
+        await session.abortTransaction();
+        console.error("Error in Setting-up Device Alert Date! - "+error.message);
+        res.status(500).json({success: false, message:"Server Error"});
+    }finally{
+        await session.endSession();
+    }
+    
     return res;
 }

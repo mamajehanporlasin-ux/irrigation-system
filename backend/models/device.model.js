@@ -1,7 +1,8 @@
 import mongoose from 'mongoose';
 
 const reservoirLevels = ['OK', 'LOW', 'FULL'];
-const waterLevels = ['OK', 'LOW', 'FULL']
+const waterLevels = ['OK', 'LOW', 'FULL'];
+const NO_ALERT = -1;
 
 const DeviceSchema = new mongoose.Schema({
     deviceID:{
@@ -38,18 +39,6 @@ const DeviceSchema = new mongoose.Schema({
         required: true,
         default: "OK"
     },
-    soilMoisture1:{
-        type: Boolean,
-        default: true
-    },
-    soilMoisture2:{
-        type: Boolean,
-        default: true
-    },
-    soilMoisture3:{
-        type: Boolean,
-        default: true
-    },
     waterLevel1:{
         type: String,
         required: true,
@@ -67,6 +56,16 @@ const DeviceSchema = new mongoose.Schema({
         required: true,
         enum: waterLevels,
         default: 'OK'
+    },
+    field1CropAlertDate:{
+        type: Number,
+        require: false,
+        default: NO_ALERT
+    },
+    field2CropAlertDate:{
+        type: Number,
+        require: false,
+        default: NO_ALERT
     }
 });
 

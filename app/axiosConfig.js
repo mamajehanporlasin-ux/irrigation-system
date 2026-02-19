@@ -3,8 +3,8 @@ import * as SecureStore from "expo-secure-store";
 
 
 const axiosInstance = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_ENDPOINT,
-  //baseURL: process.env.EXPO_PUBLIC_API_LOCAL_ENDPOINT,
+  //baseURL: process.env.EXPO_PUBLIC_API_ENDPOINT,
+  baseURL: process.env.EXPO_PUBLIC_API_LOCAL_ENDPOINT,
   withCredentials: false,
   timeout: 80000,
 });

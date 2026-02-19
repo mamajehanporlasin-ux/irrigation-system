@@ -37,18 +37,6 @@ const EventSchema = new mongoose.Schema({
         required: true,
         default: "OK"
     },
-    soilMoisture1:{
-        type: Boolean,
-        default: true
-    },
-    soilMoisture2:{
-        type: Boolean,
-        default: true
-    },
-    soilMoisture3:{
-        type: Boolean,
-        default: true
-    },
     waterLevel1:{
         type: String,
         required: true,

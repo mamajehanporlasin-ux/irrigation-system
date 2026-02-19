@@ -158,7 +158,7 @@ export default function OTPRequestScreen() {
                 <Text className="text-gray-500 font-normal">Please Input your email address and your OTP codes to reset your password.</Text>
                 <View className="flex-row">
                     <View className="border border-gray-300 rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
-                    <MaterialIcons name={"email"} size={28} color="green" />
+                    <MaterialIcons name={"email"} size={28} color="#ffa500" />
                     </View>
                     <View className="flex-1 border border-gray-300 border-l-0 rounded-lg px-4 py-1">
                     <TextInput
@@ -174,7 +174,7 @@ export default function OTPRequestScreen() {
                 </View>
                 <View className="flex-row mb-4">
                     <View className="border border-gray-300 rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
-                    <MaterialIcons name={"password"} size={28} color="green" />
+                    <MaterialIcons name={"password"} size={28} color="#ffa500" />
                     </View>
                     <View className="flex-1 border border-gray-300 border-l-0 rounded-lg px-4 py-1">
                     <TextInput
@@ -192,7 +192,7 @@ export default function OTPRequestScreen() {
                 {!isValidated ? (
                     <TouchableOpacity
                         onPress={handleValidate}
-                        className="bg-blue-600 w-fit px-5 py-4 rounded-lg"
+                        className="bg-teal-800 w-fit px-5 py-4 rounded-lg"
                     >
                         <Text className="text-white text-center font-semibold text-lg">
                             Validate
@@ -202,7 +202,7 @@ export default function OTPRequestScreen() {
                     <>
                     <View className="flex-row mb-4">
                         <View className="border border-gray-300 rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
-                        <MaterialIcons name={"lock"} size={28} color="green" />
+                        <MaterialIcons name={"lock"} size={28} color="#ffa500" />
                         </View>
                         <View className="flex-1 border border-gray-300 border-l-0 rounded-lg px-4 py-1">
                         <TextInput
@@ -219,7 +219,7 @@ export default function OTPRequestScreen() {
                     </View>
                     <View className="flex-row mb-4">
                         <View className="border border-gray-300 rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
-                        <MaterialIcons name={"lock-outline"} size={28} color="green" />
+                        <MaterialIcons name={"lock-outline"} size={28} color="#ffa500" />
                         </View>
                         <View className="flex-1 border border-gray-300 border-l-0 rounded-lg px-4 py-1">
                         <TextInput
@@ -236,7 +236,7 @@ export default function OTPRequestScreen() {
                     </View>
                         <TouchableOpacity
                             onPress={handleSubmit}
-                            className="bg-blue-600 w-fit px-5 py-4 rounded-lg"
+                            className="bg-teal-800 w-fit px-5 py-4 rounded-lg"
                         >
                             <Text className="text-white text-center font-semibold text-lg">
                                 Submit

@@ -480,3 +480,7 @@ export const validateMyPassword = async(req, res) =>{
 
     return res;
 }
+
+export const validateToken = async(req, res) =>{
+    return res.status(200).json({success: true, message: "Token is Valid!"});
+}

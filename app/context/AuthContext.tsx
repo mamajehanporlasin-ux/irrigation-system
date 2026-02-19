@@ -16,7 +16,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const loadToken = async () => {
-      const storedToken = await SecureStore.getItemAsync("authToken");
+      const storedToken = await SecureStore.getItemAsync("authTokenSmartIrrigation");
       setToken(storedToken);
       setIsLoading(false);
     };
@@ -24,12 +24,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (newToken: string) => {
-    await SecureStore.setItemAsync("authToken", newToken);
+    await SecureStore.setItemAsync("authTokenSmartIrrigation", newToken);
     setToken(newToken);
   };
 
   const logout = async () => {
-    await SecureStore.deleteItemAsync("authToken");
+    await SecureStore.deleteItemAsync("authTokenSmartIrrigation");
     setToken(null);
   };
 

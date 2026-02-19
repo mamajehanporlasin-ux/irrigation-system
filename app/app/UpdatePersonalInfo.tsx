@@ -4,7 +4,8 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  TextInput
+  TextInput,
+  Image
 } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +13,7 @@ import { Link, router, Redirect } from "expo-router";
 import loadingOverlay from "./components/LoadingOverlay";
 import axiosInstance from "@/axiosConfig";
 import Toast from "react-native-toast-message";
+import logo from "../assets/images/logo.png";
 
 const ProfileTab =()=>{
     const [isLoading, setIsLoading] = useState(false);
@@ -172,9 +174,10 @@ const ProfileTab =()=>{
                       className="w-full flex flex-col"
             >
                 
-                <View className="p-4 bg-white shadow-sm border-b border-gray-100 pt-10">
-                    <Text className="text-3xl font-extrabold text-green-700">Profile</Text>
-                    <Text className="text-base text-gray-500">view and/or update your personal Profile</Text>
+                <View className="flex flex-row h-fit items-start bg-teal-800 shadow-sm border-b border-gray-100 pt-10">
+                    <View className="flex bg-white rounded-full border-2 border-teal-800 p-5 ml-5 mb-[-15]">
+                        <Image source={logo} style={{ width: 50, height: 50 }} />
+                    </View>
                 </View>
 
                 <View className="px-7 py-10 mx-5 my-5 bg-white shadow-sm border-b border-gray-100 rounded-lg">

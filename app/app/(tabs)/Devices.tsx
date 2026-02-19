@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useIsFocused } from '@react-navigation/native';
 import {
   View,
@@ -6,16 +6,19 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
-  Modal
+  Modal,
+  BackHandler,
+  Image
 } from "react-native";
+
 import { MaterialIcons, AntDesign } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Link, router, Redirect } from "expo-router";
+import { Link, router, Redirect, useFocusEffect } from "expo-router";
 import loadingOverlay from "../components/LoadingOverlay";
 import axiosInstance from "@/axiosConfig";
 import Toast from "react-native-toast-message";
 import DeviceCard from "../components/DeviceCard";
-
+import HeaderComponent from "../components/Header";
 
 
 const DevicesTab =()=>{
@@ -44,6 +47,17 @@ const DevicesTab =()=>{
         }
     }, [isFocused]);
 
+      useFocusEffect(
+        useCallback(() => {
+          const subscription = BackHandler.addEventListener(
+            "hardwareBackPress",
+            () => true
+          );
+    
+          return () => subscription.remove();
+        }, [])
+      );
+
     const pressEventHandler = async(device)=>{
         router.push({
             pathname: "/device/[deviceID]",
@@ -67,6 +81,7 @@ const DevicesTab =()=>{
             }
         }catch(error){
             console.log("Error while retrieving your Devices! - "+error.message);
+            console.log(JSON.stringify(error));
             Toast.show({
                 type: 'error',
                 text1: '❌ Error while retrieving your Devices!',
@@ -117,10 +132,7 @@ const DevicesTab =()=>{
     return(
         <SafeAreaView className="flex-1 bg-gray-100">
             {isLoading && loadingOverlay()}
-            <View className="flex flex-col p-4 bg-white shadow-sm border-b border-gray-100 pt-10">
-                <Text className="text-3xl font-extrabold text-green-700">Devices</Text>
-                <Text className="text-base text-gray-500">Add, edit, and/or Manage your devices</Text>
-            </View>
+            <HeaderComponent />
             <View className="flex w-fit self-end my-3">
                 <TouchableOpacity
                     onPress={handleAddDeviceEvent}

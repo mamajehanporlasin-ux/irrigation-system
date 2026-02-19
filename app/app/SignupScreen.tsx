@@ -18,10 +18,10 @@ import Toast from "react-native-toast-message";
 
 const InputWithIcon = ({ icon, placeholder, value, setValue, secure = false, keyboardType = "default" }) => (
   <View className="flex-row mb-4">
-    <View className="border border-gray-300 rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
-      <MaterialIcons name={icon} size={28} color="green" />
+    <View className="border border-blue-300 rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
+      <MaterialIcons name={icon} size={28} color="#ffa500" />
     </View>
-    <View className="flex-1 border border-gray-300 border-l-0 rounded-lg px-4 py-1">
+    <View className="flex-1 border border-blue-300 border-l-0 rounded-lg px-4 py-1">
       <TextInput
         value={value}
         onChangeText={setValue}
@@ -202,7 +202,7 @@ export default function SignupScreen() {
             </Text>
           </View>
           <View className="my-8 gap-3">
-            <Text className="border border-gray-300 px-5 py-3">Your email address will be used as your User name for logging in</Text>
+            <Text className="border border-blue-300 px-5 py-3">Your email address will be used as your User name for logging in</Text>
             <InputWithIcon icon="email" placeholder="Email Address" value={email} setValue={setEmail} keyboardType="email-address" />
           </View>
             <Text className="text-xl font-bold text-center text-gray-800 mb-5">
@@ -218,10 +218,10 @@ export default function SignupScreen() {
               Your Address
             </Text>
             <View className="flex-row mb-4">
-              <View className="border border-gray-300 rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
-                <MaterialIcons name="home" size={28} color="green" />
+              <View className="border border-blue-300 rounded-tl-lg rounded-bl-lg justify-center items-center px-2">
+                <MaterialIcons name="home" size={28} color="#ffa500" />
               </View>
-              <View className="flex-1 border border-gray-300 border-l-0 rounded-lg px-4 py-1">
+              <View className="flex-1 border border-blue-300 border-l-0 rounded-lg px-4 py-1">
                 <TextInput
                   multiline
                   numberOfLines={4}
@@ -236,7 +236,7 @@ export default function SignupScreen() {
             </View>
           </View>
 
-          <View className="border border-gray-300 px-5 py-3 mb-5">
+          <View className="border border-blue-300 px-5 py-3 mb-5">
             <Text className="text-xl font-bold text-center text-gray-800 mb-5">
               Your Password
             </Text>
@@ -247,7 +247,7 @@ export default function SignupScreen() {
           
           <TouchableOpacity
             onPress={handleSignup}
-            className="bg-blue-600 py-4 rounded-lg mt-4 mb-6"
+            className="bg-teal-800 py-4 rounded-lg mt-4 mb-6"
           >
             <Text className="text-white text-center font-semibold text-lg">
               Sign Up
