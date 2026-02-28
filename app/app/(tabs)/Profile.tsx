@@ -86,6 +86,8 @@ const ProfileTab =()=>{
     const confirmLogout = async () => {
         setIsLogoutModalVisible(false);
         await logout();
+        const data={expoPushNotificationToken: "EMPTY"};
+        await axiosInstance.put("/user/set-notification-token", data, { withCredentials: true });
         router.replace("/");
     };
 

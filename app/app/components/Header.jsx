@@ -15,8 +15,8 @@ const HeaderComponent =()=>{
                     <Image source={logo} style={{ width: 50, height: 50 }} />
                 </View>
                 <View className="flex-1 mx-5">
-                    <Text className="text-white font-bold text-2xl">
-                        Arduino based Smart Irrigation System
+                    <Text className="mt-4 text-white font-bold text-2xl">
+                        Smart Rice Paddies
                     </Text>
                 </View>
         </View>

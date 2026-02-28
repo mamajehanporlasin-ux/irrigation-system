@@ -1,7 +1,7 @@
 import express from 'express';
 
 import userAuthentication from '../functions/userAuthentication.js';
-import { register, update, login, logout, sendPasswordResetOTP, resetPasswordWithOTP, changePassword, isOTPCodesCorrect, validateMyPassword, getMyInfo, validateToken } from '../controllers/user.controller.js';
+import { register, update, login, logout, sendPasswordResetOTP, resetPasswordWithOTP, changePassword, isOTPCodesCorrect, validateMyPassword, getMyInfo, validateToken, setExpoPushNotificationToken } from '../controllers/user.controller.js';
 
 const router= express.Router();
 
@@ -16,5 +16,6 @@ router.post("/validate-my-password", userAuthentication, validateMyPassword);
 router.put("/update", userAuthentication, update);
 router.get("/my-info", userAuthentication, getMyInfo);
 router.post("/check-token", userAuthentication, validateToken);
+router.put("/set-notification-token", userAuthentication, setExpoPushNotificationToken);
 
 export default router;

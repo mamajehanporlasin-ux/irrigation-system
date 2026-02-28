@@ -19,6 +19,7 @@ import axiosInstance from "@/axiosConfig";
 import Toast from "react-native-toast-message";
 import DeviceCard from "../components/DeviceCard";
 import HeaderComponent from "../components/Header";
+import { useNotification } from "@/context/NotificationContext";
 
 
 const DevicesTab =()=>{
@@ -26,8 +27,10 @@ const DevicesTab =()=>{
     const [devices, setDevices] = useState([]);
     const [showNewDeviceModal, setShowNewDeviceModal] = useState(false);
     const [newDeviceID, setNewDeviceID] = useState("");
-
     const isFocused = useIsFocused();
+    const {expoPushToken, notification, error} = useNotification();
+
+    
 
     useEffect(()=>{
         const interval = setInterval(() => {
@@ -38,6 +41,17 @@ const DevicesTab =()=>{
         
         return () => clearInterval(interval);
     }, []);
+
+    useEffect(() => {
+        const checkNotificationToken = async()=>{
+            if (expoPushToken) {
+                const data={expoPushNotificationToken: expoPushToken};
+                await axiosInstance.put("/user/set-notification-token", data, { withCredentials: true });
+            }
+        }
+
+        checkNotificationToken();
+      }, [expoPushToken]);
 
     useEffect(() => {
         if (isFocused) {
@@ -128,6 +142,11 @@ const DevicesTab =()=>{
         setNewDeviceID("");
         setShowNewDeviceModal(false);
     };
+
+    if(error){
+        return <View>Error: {error.message}</View>;
+    }
+
 
     return(
         <SafeAreaView className="flex-1 bg-gray-100">

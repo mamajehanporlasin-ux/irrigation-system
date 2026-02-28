@@ -37,6 +37,10 @@ const UserSchema = new mongoose.Schema({
     resetOTPExpire:{
         type: Number,
         default: 0
+    },
+    expoPushNotificationToken:{
+        type: String,
+        default: ""
     }
 });
 

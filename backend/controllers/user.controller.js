@@ -159,6 +159,9 @@ export const update = async(req, res) =>{
         onRecordUser.contactNumber=contactNum;
         onRecordUser.emailAddress=emailAddress;
         onRecordUser.address=add;
+        if(!onRecordUser.expoPushNotificationToken || onRecordUser.expoPushNotificationToken.length<1){
+            onRecordUser.expoPushNotificationToken="";
+        }
 
         const updatedUser =await User.findByIdAndUpdate(id, onRecordUser, {new:true, session});
 
@@ -367,6 +370,9 @@ export const changePassword = async (req, res) =>{
         session.startTransaction();
         const hashedPassword = await bcrypt.hash(newPassword, salt);
         user.password = hashedPassword;
+        if(!onRecordUser.expoPushNotificationToken || onRecordUser.expoPushNotificationToken.length<1){
+            onRecordUser.expoPushNotificationToken="";
+        }
 
         await User.findByIdAndUpdate(id, user, {new: true, session});
         await session.commitTransaction();
@@ -483,4 +489,56 @@ export const validateMyPassword = async(req, res) =>{
 
 export const validateToken = async(req, res) =>{
     return res.status(200).json({success: true, message: "Token is Valid!"});
+}
+
+export const setExpoPushNotificationToken = async(req, res) =>{
+    if(!req.body){
+        return res.status(400).json({success: false, message: "Invalid values!"});
+    }
+
+    const id=req.body._id;
+    const expoPushNotificationToken =  req.body.expoPushNotificationToken;
+
+    if(!expoPushNotificationToken||expoPushNotificationToken.length<1){
+        return res.status(200).json({success: false, message: "Invalid Push Notification Token!"});
+    }
+
+    const session = await mongoose.startSession();
+    try{
+
+        const onRecordUser = await User.findById(id);
+        if(!onRecordUser){
+            return res.status(200).json({success: false, message: "Invalid User Account ID!"});
+        }
+
+        const userWithSameToken = await User.findOne({expoPushNotificationToken: expoPushNotificationToken});
+
+        session.startTransaction();
+
+        if(userWithSameToken && !userWithSameToken._id.equals(id)){
+            userWithSameToken.expoPushNotificationToken="";
+            await User.findByIdAndUpdate(userWithSameToken._id, userWithSameToken, {new:true, session});
+        }
+
+        if(expoPushNotificationToken==="EMPTY"){
+            onRecordUser.expoPushNotificationToken="";
+        }else{
+            onRecordUser.expoPushNotificationToken=expoPushNotificationToken;
+        }
+        
+        
+        const updatedUser =await User.findByIdAndUpdate(id, onRecordUser, {new:true, session});
+
+        await session.commitTransaction();
+
+        res.status(200).json({success: true, message: "Expo Notification Token Set Successfully!"});
+    }catch(error){
+        await session.abortTransaction();
+        console.error("Error in setting User's Expo Notification Token! - "+error.message);
+        res.status(500).json({success: false, message:"Server Error"});
+    }finally{
+        await session.endSession();
+    }
+
+    return res;
 }

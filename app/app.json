@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Arduino Irrigation System",
+    "name": "Smart Rice Paddies",
     "slug": "app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +20,10 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.dev.smartirrigationiot"
+      "package": "com.dev.smartirrigationiot",
+      "googleServicesFile": "./google-services.json",
+      "compileSdkVersion": 34,
+      "targetSdkVersion": 34
     },
     "web": {
       "output": "static",
@@ -46,6 +49,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d20cf169-30b3-43ae-a00b-888b9f8c76f1"
+      }
+    },
+    "owner": "syncquirk-labs"
   }
 }

@@ -17,6 +17,7 @@ import Toast from "react-native-toast-message";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/images/logo.png";
 
+
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,9 +26,6 @@ export default function LoginScreen() {
   const { token, isLoading: authLoading, login, logout } = useAuth();
   
   
-  /*if(token){
-    return <Redirect href="/(tabs)/Devices" />;
-  }*/
   useEffect(() => {
     
     const verifyToken = async () => {
@@ -52,24 +50,6 @@ export default function LoginScreen() {
 
   if (authLoading) 
       return null;
-
-  const isTokenValid= async() =>{
-      setIsLoading(true);
-      try{
-        const data={}
-        const response = await axiosInstance.post("/user/check-token", data, {withCredentials: true});
-          if(response.data.success){
-            setIsLoading(false);
-            //return <Redirect href="/(tabs)/Devices" />;
-            await login(token);
-            router.push("/(tabs)/Devices");
-            router.replace('/(tabs)/Devices');
-          }
-        }catch(error){
-            console.log("Error while Checking for token validity! - "+error.message);
-        }
-        setIsLoading(false);
-  }
 
   const handleLogin = async() => {
       setIsLoading(true);
@@ -138,7 +118,7 @@ export default function LoginScreen() {
               <Image source={logo} style={{ width: 150, height: 150 }}  className="p-5 border-2 border-teal-500 rounded-full"/>
             </View>
             <Text className="text-3xl font-bold text-center text-black mb-2">
-                Arduino based Smart Irrigation System
+                Smart Rice Paddies
             </Text>
             
           <Text className="text-center text-gray-500 mt-2">

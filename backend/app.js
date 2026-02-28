@@ -8,6 +8,7 @@ import eventRouter from './routers/event.router.js';
 import checkOfflineDevices from './functions/checkOfflineDevices.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { sendDueReminders } from './functions/sendDueReminder.js';
 
 const app = express();
 app.use(express.json());
@@ -39,6 +40,8 @@ app.get("/", (req, res)=>{
 });
 
 setInterval(checkOfflineDevices, 30000);
+//setInterval(sendDueReminders, 900000);
+setInterval(sendDueReminders, 60000);
 
 app.listen(PORT, '0.0.0.0', ()=>{
     dbConnection();
