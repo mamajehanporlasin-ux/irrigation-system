@@ -57,7 +57,6 @@ export const register = async(req, res) =>{
 
     const salt = Number (process.env.SALT || 10);
 
-    const session = await mongoose.startSession();
 
     try{
 
@@ -65,7 +64,6 @@ export const register = async(req, res) =>{
             return res.status(200).json({success: false, message: "Email Address is already in use!"});
         }
 
-        session.startTransaction();
         
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -79,22 +77,17 @@ export const register = async(req, res) =>{
         user.emailAddress=emailAdd;
         user.address=add;
         
-        await user.save({session});
+        await user.save();
 
 
         await sendNewPasswordEmail(emailAdd, fName+" "+lName);
         
-        await session.commitTransaction();
-
         res.status(200).json({success: true, data: [user]});
     }catch(error){
-        if(session.inTransaction()){
-            await session.abortTransaction();
-        }
         console.error("Error in User Account creation! - "+error.message);
         res.status(500).json({success: false, message:"Server Error"});
     }finally{
-        await session.endSession();
+        
     }
     
     return res;
@@ -139,7 +132,6 @@ export const update = async(req, res) =>{
         return res.status(200).json({success: false, message: "Invalid User Account ID!"});
     }
 
-    const session = await mongoose.startSession();
     try{
 
         const onRecordUser = await User.findById(id);
@@ -151,7 +143,6 @@ export const update = async(req, res) =>{
             return res.status(200).json({success: false, message: "Email Address is already in use!"});
         }
 
-        session.startTransaction();
 
         onRecordUser.lastName=lName;
         onRecordUser.firstName=fName;
@@ -163,23 +154,21 @@ export const update = async(req, res) =>{
             onRecordUser.expoPushNotificationToken="";
         }
 
-        const updatedUser =await User.findByIdAndUpdate(id, onRecordUser, {new:true, session});
-
-        await session.commitTransaction();
+        const updatedUser =await User.findByIdAndUpdate(id, onRecordUser, {new:true});
 
         res.status(200).json({success: true, data: [updatedUser]});
     }catch(error){
-        await session.abortTransaction();
+        
         console.error("Error in User Account update! - "+error.message);
         res.status(500).json({success: false, message:"Server Error"});
     }finally{
-        await session.endSession();
     }
 
     return res;
 }
 
 export const login = async (req, res) =>{
+    console.log(JSON.stringify(req.body));
     if(!req.body){
         return res.status(200).json({success: false, message: "Invalid values!"});
     }
@@ -252,32 +241,28 @@ export const sendPasswordResetOTP = async (req, res) =>{
         return res.status(200).json({success: false, message: "Invalid email!"});
     }
 
-    const session = await mongoose.startSession();
     try{
         const userData = await User.findOne({emailAddress: email});
         if(!userData){
             res.status(200).json({success: false, message: "No Account found with this email!"});
         }else{
-            session.startTransaction();
             const otp = String(Math.floor(100000 + Math.random() * 900000));
 
             userData.resetOTP = otp;
             userData.resetOTPExpire = Date.now() + 5 * 60 * 1000;
 
-            await User.findByIdAndUpdate(userData._id, userData, {new:true, session});
+            await User.findByIdAndUpdate(userData._id, userData, {new:true});
 
             await sendPasswordResetOTPEmail(userData.emailAddress, userData.firstName+" "+userData.lastName, otp);
 
-            await session.commitTransaction();
             res.status(200).json({success: true, message: "Password Reset OTP codes sent successfully!"});
         }
 
     }catch(error){
-        await session.abortTransaction();
+
         console.error("Error in creating a Password reset OTP codes for User Account! - "+error.message);
         res.status(500).json({success: false, message: error.message});
     }finally{
-        await session.endSession();
     }
 
     return res;
@@ -360,29 +345,25 @@ export const changePassword = async (req, res) =>{
     }
 
     const salt = Number (process.env.SALT || 10);
-    const session = await mongoose.startSession();
+    
     try{
         const user=await User.findById(id);
         if(!user){
             return res.status(401).json({success: false, message: "Authentication failed!"});
         }
 
-        session.startTransaction();
         const hashedPassword = await bcrypt.hash(newPassword, salt);
         user.password = hashedPassword;
         if(!onRecordUser.expoPushNotificationToken || onRecordUser.expoPushNotificationToken.length<1){
             onRecordUser.expoPushNotificationToken="";
         }
 
-        await User.findByIdAndUpdate(id, user, {new: true, session});
-        await session.commitTransaction();
+        await User.findByIdAndUpdate(id, user, {new: true});
         res.status(200).json({success: true, message: "Password updated successfully!"});
     }catch(error){
         console.log("error changing password: - "+error.message);
         res.status(500).json({success: false, message: "Server Error!\n"+error.message});
-        await session.abortTransaction();
     }finally{
-        await session.endSession();
     }
 
     return res;
@@ -503,7 +484,7 @@ export const setExpoPushNotificationToken = async(req, res) =>{
         return res.status(200).json({success: false, message: "Invalid Push Notification Token!"});
     }
 
-    const session = await mongoose.startSession();
+
     try{
 
         const onRecordUser = await User.findById(id);
@@ -513,11 +494,11 @@ export const setExpoPushNotificationToken = async(req, res) =>{
 
         const userWithSameToken = await User.findOne({expoPushNotificationToken: expoPushNotificationToken});
 
-        session.startTransaction();
+
 
         if(userWithSameToken && !userWithSameToken._id.equals(id)){
             userWithSameToken.expoPushNotificationToken="";
-            await User.findByIdAndUpdate(userWithSameToken._id, userWithSameToken, {new:true, session});
+            await User.findByIdAndUpdate(userWithSameToken._id, userWithSameToken, {new:true});
         }
 
         if(expoPushNotificationToken==="EMPTY"){
@@ -527,17 +508,14 @@ export const setExpoPushNotificationToken = async(req, res) =>{
         }
         
         
-        const updatedUser =await User.findByIdAndUpdate(id, onRecordUser, {new:true, session});
+        const updatedUser =await User.findByIdAndUpdate(id, onRecordUser, {new:true});
 
-        await session.commitTransaction();
 
         res.status(200).json({success: true, message: "Expo Notification Token Set Successfully!"});
     }catch(error){
-        await session.abortTransaction();
         console.error("Error in setting User's Expo Notification Token! - "+error.message);
         res.status(500).json({success: false, message:"Server Error"});
     }finally{
-        await session.endSession();
     }
 
     return res;

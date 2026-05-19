@@ -31,12 +31,6 @@ const EventSchema = new mongoose.Schema({
         required: true,
         default: 0
     },
-    reservoirLevel:{
-        type: String,
-        enum: reservoirLevels,
-        required: true,
-        default: "OK"
-    },
     waterLevel1:{
         type: String,
         required: true,
@@ -49,12 +43,71 @@ const EventSchema = new mongoose.Schema({
         enum: waterLevels,
         default: 'OK'
     },
-    waterLevel3:{
-        type: String,
-        required: true,
-        enum: waterLevels,
-        default: 'OK'
-    }
+    isRaining:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    soilMoist1:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    soilMoist2:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    soilMoist3:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    soilMoist4:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    soilMoist5:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    soilMoist6:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    pump1:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    pump2:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    pump3:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    pump4:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    pump5:{
+        type: Number,
+        require: false,
+        default: 0
+    },
+    pump6:{
+        type: Number,
+        require: false,
+        default: 0
+    },
 });
 
 const Event=mongoose.model('Event', EventSchema);

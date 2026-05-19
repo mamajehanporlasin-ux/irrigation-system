@@ -77,7 +77,8 @@ export default function LoginScreen() {
             "password": password
         }
         const response = await axiosInstance.post("/user/login", data, {withCredentials: true});
-            if(!response.data.success){
+        console.log(response.config.baseURL+response.config.url);    
+        if(!response.data.success){
                 Toast.show({
                 type: 'error',
                 text1: '❌ Error while trying to login!',

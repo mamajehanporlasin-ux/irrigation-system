@@ -64,7 +64,6 @@ export const submitData = async(req, res)=>{
         w3="LOW";
     }
 
-    const session = await mongoose.startSession();
     try{
         const onRecordDevice = await Device.find({"deviceID": deviceID});
         console.log("data: "+JSON.stringify(onRecordDevice));
@@ -72,7 +71,6 @@ export const submitData = async(req, res)=>{
             return res.status(200).json({success: false, message: "Device not found!"});
         }
         
-        session.startTransaction();
 
         const newEvent = new Event();
         newEvent.device = onRecordDevice[0]._id;
@@ -87,14 +85,11 @@ export const submitData = async(req, res)=>{
 
         await newEvent.save();
 
-        await session.commitTransaction();
         res.status(200).json({success: true, message: "data submission successfully saved!"});
     }catch(error){
-        await session.abortTransaction();
         console.error("Error in saving Data from device! - "+error.message);
         res.status(500).json({success: false, message:"Server Error"});
     }finally{
-        await session.endSession();
     }
     
     return res;

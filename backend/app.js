@@ -41,7 +41,7 @@ app.get("/", (req, res)=>{
 
 setInterval(checkOfflineDevices, 30000);
 //setInterval(sendDueReminders, 900000);
-setInterval(sendDueReminders, 60000);
+setInterval(sendDueReminders, 3600000);
 
 app.listen(PORT, '0.0.0.0', ()=>{
     dbConnection();
